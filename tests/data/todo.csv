@@ -1,0 +1,34 @@
+--- TODO: PASSWORD VALIDATION ---
+P01,password_empty,user@example.com,"",422,Validation failed
+P02,password_short,user@example.com,123,422,Validation failed
+P03,password_spaces,user@example.com,"  Secret123  ",422,Validation failed
+P04,password_too_long,user@example.com,AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,422,Validation failed
+P05,password_only_spaces,user@example.com,"        ",422,Validation failed
+P06,password_common_word,user@example.com,password,422,Validation failed
+P07,password_no_uppercase,user@example.com,secret123!,422,Validation failed
+P08,password_no_lowercase,user@example.com,SECRET123!,422,Validation failed
+P09,password_no_digit,user@example.com,Secret!!!,422,Validation failed
+P10,password_no_special,user@example.com,Secret123,422,Validation failed
+P11,password_too_common,user@example.com,password,422,Validation failed
+P12,password_too_common_digits,user@example.com,123456,422,Validation failed
+P13,password_equals_username,testuser,testuser,422,Validation failed
+P14,password_equals_email,user@example.com,user@example.com,422,Validation failed
+
+
+
+--- TODO: USERNAME STRICT VALIDATION ---
+Uncomment when strict username rules are enabled in UserModel.validate_username
+
+
+U12,username_starts_dot,.username,user@example.com,Secret123,422,Validation failed
+U13,username_starts_dash,-username,user@example.com,Secret123,422,Validation failed
+U14,username_starts_underscore,_username,user@example.com,Secret123,422,Validation failed
+U15,username_ends_dot,username.,user@example.com,Secret123,422,Validation failed
+U16,username_ends_dash,username-,user@example.com,Secret123,422,Validation failed
+U17,username_ends_underscore,username_,user@example.com,Secret123,422,Validation failed
+U18,username_double_dot,user..name,user@example.com,Secret123,422,Validation failed
+U19,username_double_dash,user--name,user@example.com,Secret123,422,Validation failed
+U20,username_double_underscore,user__name,user@example.com,Secret123,422,Validation failed
+U21,username_mixed_double,user.-name,user@example.com,Secret123,422,Validation failed
+U22,username_only_digits,123456,user@example.com,Secret123,422,Validation failed
+U23,username_invalid_chars,user!name,user@example.com,Secret123,422,Validation failed

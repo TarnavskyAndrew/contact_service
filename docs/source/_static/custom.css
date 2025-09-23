@@ -1,0 +1,60 @@
+body {
+    font-family: "Segoe UI", sans-serif;
+    background-color: #fdfdfd;
+}
+
+h1, h2, h3 {
+    color: #4a69ef;
+}
+
+
+dl.field-list {
+    font-size: 0.95rem;
+    line-height: 1.4;
+}
+
+dl.field-list dt {
+    font-weight: bold;
+    color: #333;
+}
+
+dl.field-list code {
+    font-family: monospace;
+    font-size: 0.95rem;
+    color: #4a69ef;
+}
+
+
+/* Вирівнювання стилю параметрів/ретернів */
+dl.field-list {
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 10px 15px;
+    background: #fafafa;
+    font-size: 0.95rem;
+}
+
+dl.field-list dt {
+    font-weight: bold;
+    color: #2c3e50;
+    margin-top: 6px;
+}
+
+dl.field-list dd {
+    margin-left: 20px;
+    margin-bottom: 8px;
+}
+
+
+
+/* Центруємо та розширюємо текстову область */
+body {
+    max-width: 1200px;
+    margin: 0 auto;
+    background-color: #f8f9fa; /* фон */
+}
+
+div.document {
+    width: 90%;
+    margin: auto;
+}

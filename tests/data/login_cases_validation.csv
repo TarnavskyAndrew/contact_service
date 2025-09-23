@@ -1,0 +1,45 @@
+case_id,description,email,password,expected_status,expected_msg
+E01,email_empty,"",Secret123,422,Validation failed
+E02,email_without_@,invalid-email,Secret123,422,Validation failed
+E03,email_double_at,user@@example.com,Secret123,422,Validation failed
+E04,email_space_before,user @example.com,Secret123,422,Validation failed
+E05,email_space_after,user@ example.com,Secret123,422,Validation failed
+E06,email_spaces_around," user@example.com ",Secret123,401,Invalid email
+E07,email_starts_dot,.user@example.com,Secret123,422,Validation failed
+E08,email_starts_dash,-user@example.com,Secret123,422,Validation failed
+E09,email_starts_comma,",user@example.com",Secret123,422,Validation failed
+E10,email_ends_dot,user.@example.com,Secret123,422,Validation failed
+E11,email_with_dollar,user$name@example.com,Secret123,422,Validation failed
+E12,email_with_brackets,user<>@example.com,Secret123,422,Validation failed
+E13,email_with_comma,"user,comma@example.com",Secret123,422,Validation failed
+E14,email_domain_no_dot,user@example,Secret123,422,Validation failed
+E15,email_unicode,юзер@пример.рф,Secret123,422,Validation failed
+E16,email_double_dot_local,user..name@example.com,Secret123,422,Validation failed
+E17,email_double_dot_domain,user@example..com,Secret123,422,Validation failed
+E18,email_domain_starts_dash,user@-example.com,Secret123,422,Validation failed
+E19,email_domain_ends_dash,user@example-.com,Secret123,422,Validation failed
+E20,email_domain_with_underscore,user@exam_ple.com,Secret123,422,Validation failed
+E21,email_local_length_boundary_64,aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa@example.com,Secret123,401,Invalid email
+E22,email_local_length_too_long_65,aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa@example.com,Secret123,422,Validation failed
+E23,email_domain_too_long,user@averylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaveryyyyyyy.com,Secret123,422,Validation failed
+E24,email_total_too_long_length_boundary,aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa@examplelongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylon.com,Secret123,401,Invalid email
+E25,email_total_too_long,aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa@examplelongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylongaverylong.com,Secret123,422,Validation failed
+E26,email_len_length_too_small_5,a@b.c,Secret123,422,validation failed
+E27,email_len_length_boundary_6,a@b.co,Secret123,200,OK
+P01,password_empty,user@example.com,"",422,Validation failed
+P02,password_short,user@example.com,123,422,Validation failed
+P03,password_spaces,user@example.com,"     ",422,Validation failed
+P04,password_too_long,user@example.com,AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,422,Validation failed
+P05,password_only_spaces,user@example.com,"        ",422,Validation failed
+P06,password_common_word,user@example.com,password,401,Invalid email
+B01,valid_not_confirmed,user@example.com,Secret123,401,Invalid email
+B02,valid_not_in_db,valid@example.com,Secret123,401,Invalid email
+B03,email_rfc_limit_exceeded,averylong.............................................................................................................................................................................................................................................................@example.com,Secret123,422,Validation failed
+B04,email_starts_with_underscore,_user@example.com,Secret123,401,Invalid email
+B05,valid_not_in_db_email_with_dot_in_local,user.name@example.com,Secret123,401,Invalid email
+B06,email_with_underscore_in_local,user_name@example.com,Secret123,401,Invalid email
+B07,email_with_dash_in_local,user-name@example.com,Secret123,401,Invalid email
+B08,wrong_password,user@example.com,secre,422,Validation failed
+
+
+

@@ -1,0 +1,99 @@
+version: "3.9"
+
+services:
+  redis:
+    image: redis:alpine
+    container_name: redis_contact_service
+    ports:
+      - "6379:6379"
+
+  postgres:
+    image: postgres:16
+    container_name: postgres_contact_service
+    environment:
+      POSTGRES_DB: ${PG_DB_NAME}
+      POSTGRES_USER: ${PG_USER}
+      POSTGRES_PASSWORD: ${PG_PASSWORD}
+      # TZ: Europe/Kyiv     
+      # PGTZ: 'Europe/Kyiv'       
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
+
+  # app:
+  #   build: .
+  #   container_name: fastapi_contact_service
+  #   command: uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload
+  #   volumes:
+  #     - .:/code
+  #   ports:
+  #     - "8000:8000"
+  #   env_file:
+  #     - .env
+  #   depends_on:
+  #     - postgres
+  #     - redis
+
+
+  # pgadmin:
+  #   image: dpage/pgadmin4
+  #   container_name: pgadmin_contact_service
+  #   environment:
+  #     PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+  #     PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+  #   ports:
+  #     - "9999:80"
+  #   depends_on:
+  #     - postgres
+  #   restart: unless-stopped
+  #   # http://localhost:9999
+
+
+  # jenkins:
+  #   image: jenkins/jenkins:lts
+  #   container_name: jenkins_contact_service
+  #   user: root
+  #   ports:
+  #     - "8090:8080"   # веб-інтерфейс Jenkins
+  #     - "50000:50000" # агентский порт Jenkins (для підключення workers)
+  #   volumes:
+  #     - ./jenkins_contact_service:/var/jenkins_contact_service # збереження даних (jobs, плагіни)
+  #   restart: unless-stopped
+  #   # http://localhost:8090
+  #   # 8080  - jenkins локально слухає на 8080
+
+
+    
+
+    
+
+
+
+
+# docker-compose up -d
+# docker-compose ps
+# docker-compose down -v
+
+
+# Полная пересборка (якщо змінювався Dockerfile)
+# docker-compose down
+# docker-compose build --no-cache
+# docker-compose up -d
+
+# --- PGAdmin: ---
+# docker compose up -d --build pgadmin   - піднімаємо PGAdmin
+# docker compose logs -f pgadmin         - перегляд логів
+# netstat -ano | findstr 5050            - перевіряємо чи занятий порт
+# tasklist /FI "PID eq 20776"            - звільняємо порт
+# docker compose restart pgadmin         - перезапуск PGAdmin
+
+# --- Перезапуск окремих сервісів: ---
+# docker-compose restart postgres
+# docker-compose restart redis
+# docker-compose restart pgadmin
+
+
+# --- Jenkins: ---
+# docker ps - імя контейнера
+# docker exec jenkins_contact_service cat /var/jenkins_contact_service/secrets/initialAdminPassword  - отримати пароль

@@ -1,0 +1,132 @@
+{
+    "local-history.path": "${workspaceFolder}/.history",
+    "local-history.enabled": 1,
+    "local-history.daysLimit": 30,
+    "local-history.maxDisplay": 100,
+    "local-history.saveDelay": 2,
+    "local-history.exclude": [
+        "**/node_modules",
+        "**/.git",
+        "**/.history",
+        "**/venv",
+        "**/__pycache__"
+    ],
+    "editor.formatOnSave": true,
+    "[python]": {
+        "editor.defaultFormatter": "ms-python.black-formatter"
+    },
+    "python.analysis.typeCheckingMode": "basic",
+    "files.exclude": {
+        "**/__pycache__": true,
+        "**/.git": true,
+        "**/.venv": true,
+        "**/.mypy_cache": true,
+        "**/.pytest_cache": true,
+    },
+    "code-runner.saveFileBeforeRun": true,
+    "todo-tree.general.tags": [
+        "TODO",
+        "FIXME",
+        "BUG",
+        "HACK",
+        "NOTE"
+    ],
+    "todo-tree.highlights.defaultHighlight": {
+        "type": "text",
+        "icon": "check",
+        "iconColour": "#FFA500",
+        "foreground": "#FFA500",
+        "background": "#00000000"
+    },
+    "todo-tree.highlights.customHighlight": {
+        "TODO": {
+            "icon": "check",
+            "foreground": "#00FF00",
+            "type": "text"
+        },
+        "FIXME": {
+            "icon": "bug",
+            "foreground": "#FF0000",
+            "type": "text"
+        },
+        "BUG": {
+            "icon": "issue-opened",
+            "foreground": "#FF00FF",
+            "type": "text"
+        },
+        "HACK": {
+            "icon": "flame",
+            "foreground": "#FFA500",
+            "type": "text"
+        },
+        "NOTE": {
+            "icon": "note",
+            "foreground": "#00BFFF",
+            "type": "text"
+        }
+    },
+    "todo-tree.regex.regex": "(//|#|<!--|;|/\\*|^)\\s*($TAGS)",
+    "todo-tree.tree.showScanModeButton": true,
+    "todo-tree.tree.labelFormat": "${tag} - ${after}",
+    "todo-tree.tree.expanded": true,
+    "todo-tree.tree.autoRefresh": true,
+    "todo-tree.tree.excludeGlobs": [
+        "**/node_modules/**",
+        "**/__pycache__/**",
+        "**/.venv/**",
+        "**/dist/**",
+        "**/build/**"
+    ],
+    "todo-tree.general.rootFolder": "",
+    "todo-tree.filtering.includeGlobs": [
+        "**/*.py",
+        "**/*.md"
+    ],
+    "better-comments.tags": [
+        {
+            "tag": "!",
+            "color": "#FF2D00",
+            "strikethrough": false,
+            "underline": false,
+            "backgroundColor": "transparent",
+            "bold": false,
+            "italic": false
+        },
+        {
+            "tag": "?",
+            "color": "#3498DB",
+            "strikethrough": false,
+            "underline": false,
+            "backgroundColor": "transparent",
+            "bold": false,
+            "italic": false
+        },
+        {
+            "tag": "//",
+            "color": "#474747",
+            "strikethrough": true,
+            "underline": false,
+            "backgroundColor": "transparent",
+            "bold": false,
+            "italic": false
+        },
+        {
+            "tag": "todo",
+            "color": "#FF8C00",
+            "strikethrough": false,
+            "underline": false,
+            "backgroundColor": "transparent",
+            "bold": false,
+            "italic": false
+        },
+        {
+            "tag": "*",
+            "color": "#98C379",
+            "strikethrough": false,
+            "underline": false,
+            "backgroundColor": "transparent",
+            "bold": false,
+            "italic": false
+        }
+    ],
+}
