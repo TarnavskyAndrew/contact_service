@@ -77,7 +77,7 @@ class Settings(BaseSettings):
 
     # --- Properties для строк ---
     @property
-    # Асинк URL для FastAPI (asyncpg)
+    # Async url for SQLAlchemy (asyncpg)
     def async_db_url(self) -> str:  
         if self.DATABASE_URL:
             return self.DATABASE_URL
@@ -92,6 +92,19 @@ class Settings(BaseSettings):
         ):
             return (
                 f"postgresql+asyncpg://{self.PG_USER}:{self.PG_PASSWORD}"
+                f"@{self.PG_DOMAIN}:{self.PG_PORT}/{self.PG_DB_NAME}"
+            )
+        raise ValueError("DATABASE_URL or PG_* variables must be set")
+    
+    
+    @property
+    # Sinc url for Alembic (psycopg2)
+    def sync_db_url(self) -> str:
+        if self.DATABASE_URL:
+            return self.DATABASE_URL.replace("+asyncpg", "+psycopg2")
+        if all([self.PG_USER, self.PG_PASSWORD, self.PG_DOMAIN, self.PG_PORT, self.PG_DB_NAME]):
+            return (
+                f"postgresql+psycopg2://{self.PG_USER}:{self.PG_PASSWORD}"
                 f"@{self.PG_DOMAIN}:{self.PG_PORT}/{self.PG_DB_NAME}"
             )
         raise ValueError("DATABASE_URL or PG_* variables must be set")
