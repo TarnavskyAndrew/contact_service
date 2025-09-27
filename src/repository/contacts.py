@@ -1,6 +1,6 @@
 from datetime import date, timedelta
 from typing import List
-from sqlalchemy import select, or_, and_, func
+from sqlalchemy import select, or_, and_, func, extract
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import HTTPException, status
 
@@ -277,6 +277,12 @@ async def get_upcoming_birthdays(
                 ),
             )
         )
+        
+    # Add sorting by month and day (ignoring year)
+    stmt = stmt.order_by(
+        extract("month", Contact.birthday),
+        extract("day", Contact.birthday),
+    )
 
     res = await db.execute(stmt)
     return list(res.scalars().all())
