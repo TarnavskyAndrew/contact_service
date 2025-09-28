@@ -11,9 +11,9 @@ from src.schemas import ContactCreate, ContactUpdate
 async def get_contacts(
     skip: int, limit: int, user: User, db: AsyncSession
 ) -> List[Contact]:
-    
     """
-    Retrieve a paginated list of contacts for the given user.
+    Retrieve a paginated list of contacts for the given user,
+    sorted by ID in ascending order.
 
     :param skip: Number of records to skip (offset).
     :type skip: int
@@ -26,9 +26,13 @@ async def get_contacts(
     :return: List of contacts.
     :rtype: list[Contact]
     """
-    
+
     result = await db.execute(
-        select(Contact).where(Contact.user_id == user.id).offset(skip).limit(limit)
+        select(Contact)
+        .where(Contact.user_id == user.id)
+        .order_by(Contact.id)  # sorting by ID
+        .offset(skip)
+        .limit(limit)
     )
     return list(result.scalars().all())
 
@@ -55,7 +59,6 @@ async def get_contact(contact_id: int, user: User, db: AsyncSession) -> Contact 
 
 
 async def create_contact(body: ContactCreate, user: User, db: AsyncSession) -> Contact:
-    
     """
     Create a new contact for the given user.
 
@@ -69,7 +72,7 @@ async def create_contact(body: ContactCreate, user: User, db: AsyncSession) -> C
     :return: Newly created contact.
     :rtype: Contact
     """
-    
+
     contact = Contact(**body.model_dump(), user_id=user.id)
     db.add(contact)
     try:
@@ -86,7 +89,6 @@ async def create_contact(body: ContactCreate, user: User, db: AsyncSession) -> C
 async def update_contact(
     contact_id: int, body: ContactUpdate, user: User, db: AsyncSession
 ) -> Contact | None:
-    
     """
     Update an existing contact for the given user.
 
@@ -100,8 +102,8 @@ async def update_contact(
     :type db: AsyncSession
     :return: Updated contact if found, else None.
     :rtype: Contact | None
-    """    
-    
+    """
+
     result = await db.execute(
         select(Contact).where(
             and_(Contact.id == contact_id, Contact.user_id == user.id)
@@ -117,7 +119,6 @@ async def update_contact(
 
 
 async def delete_contact(contact_id: int, user: User, db: AsyncSession) -> bool:
-    
     """
     Delete a contact by ID for the given user.
 
@@ -129,8 +130,8 @@ async def delete_contact(contact_id: int, user: User, db: AsyncSession) -> bool:
     :type db: AsyncSession
     :return: True if contact was deleted, False otherwise.
     :rtype: bool
-    """    
-    
+    """
+
     result = await db.execute(
         select(Contact).where(
             and_(Contact.id == contact_id, Contact.user_id == user.id)
@@ -142,12 +143,11 @@ async def delete_contact(contact_id: int, user: User, db: AsyncSession) -> bool:
         await db.commit()
     if not contact:
         return False
-    return True    
+    return True
     # return contact #_______________________змінив для тестів
 
 
 async def search_contacts(q: str, user: User, db: AsyncSession) -> List[Contact]:
-
     """
     Search contacts by first name, last name, or email.
 
@@ -277,7 +277,7 @@ async def get_upcoming_birthdays(
                 ),
             )
         )
-        
+
     # Add sorting by month and day (ignoring year)
     stmt = stmt.order_by(
         extract("month", Contact.birthday),

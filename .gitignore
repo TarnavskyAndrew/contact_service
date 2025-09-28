@@ -9,6 +9,7 @@ temp/
 *.pyc
 *.tmp
 *.temp
+temp*
 
 #log files
 *.log

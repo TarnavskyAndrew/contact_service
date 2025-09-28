@@ -8,6 +8,8 @@ from pydantic import EmailStr
 from src.conf.config import settings
 
 
+# poetry run python check_smtp.py
+
 logger = logging.getLogger(__name__)
 
 #: Directory for storing emails locally if SMTP is unavailable or DEBUG mode enabled.
