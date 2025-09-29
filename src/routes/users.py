@@ -134,6 +134,9 @@ async def update_avatar_user(
 
     await validate_file_size(file)  # validate file size (max 2 MB)
 
+    if file.content_type not in ("image/png", "image/jpeg", "image/jpg", "image/webp"):
+        raise HTTPException(status_code=415, detail="Unsupported media type")
+
     cloudinary.config(
         cloud_name=settings.CLOUDINARY_NAME,
         api_key=settings.CLOUDINARY_API_KEY,
