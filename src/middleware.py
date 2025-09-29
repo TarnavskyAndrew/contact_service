@@ -1,11 +1,13 @@
 import time
-from fastapi import Request
+from fastapi import Request, HTTPException, status
 from fastapi.responses import Response
 from fastapi.middleware.cors import CORSMiddleware
 
 
-async def add_process_time_header(request: Request, call_next):
+MAX_FILE_SIZE = 2 * 1024 * 1024  # 2 MB
 
+
+async def add_process_time_header(request: Request, call_next):
     """
     Middleware: measure and add request processing time.
 
@@ -23,7 +25,7 @@ async def add_process_time_header(request: Request, call_next):
     Example header::
 
         X-Process-Time: 0.003512
-    """    
+    """
 
     start_time = time.time()
     response: Response = await call_next(request)
@@ -32,12 +34,37 @@ async def add_process_time_header(request: Request, call_next):
     return response
 
 
+async def limit_upload_size(request: Request, call_next):
+    """
+    Middleware: enforce file upload size limit for avatar endpoints.
+
+    - Applies only to ``PUT /users/avatar`` and ``PATCH /users/avatar``.
+    - Checks ``Content-Length`` header before reading body.
+    - Rejects requests larger than 2 MB with HTTP 413.
+
+    :param request: Incoming FastAPI request.
+    :type request: Request
+    :param call_next: Next request handler in the middleware chain.
+    :type call_next: Callable
+    :return: Response or HTTP 413 exception if payload too large.
+    :rtype: Response
+    """
+    if request.url.path.endswith("/avatar") and request.method in ("PUT", "PATCH"):
+        content_length = request.headers.get("content-length")
+        if content_length and int(content_length) > MAX_FILE_SIZE:
+            raise HTTPException(
+                status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
+                detail=f"File too large. Max allowed size is {MAX_FILE_SIZE // (1024 * 1024)}MB",
+            )
+    return await call_next(request)
+
+
 def setup_middlewares(app):
-    
     """
     Register middlewares for the FastAPI application.
 
-    - Adds custom middleware :func:`add_process_time_header`.
+    - Adds :func:`add_process_time_header` to measure processing time.
+    - Adds :func:`limit_upload_size` to restrict avatar upload size to 2MB.
     - Configures **CORS** with permissive settings (all origins, all methods).
 
     :param app: FastAPI application instance.
@@ -52,10 +79,11 @@ def setup_middlewares(app):
 
         app = FastAPI()
         setup_middlewares(app)
-    """    
-    
+    """
+
     # register custom middleware
     app.middleware("http")(add_process_time_header)  # add new middleware here ->
+    app.middleware("http")(limit_upload_size)  # new size limit
 
     # register CORS
     app.add_middleware(
