@@ -43,8 +43,11 @@ contact_service/
 │   ├─ env.py
 │   └─ versions/...
 │
+├─ utils/
+│   └─ validate_file_size.py  # utility to validate uploaded file size
+│
 ├── postman/             
-│   └──contact_service_smoke_tests.postman_collection.json
+│   └──contact_service_tests.postman_collection.json
 │
 ├── src/
 │    ├─ conf/

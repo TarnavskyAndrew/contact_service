@@ -13,6 +13,7 @@ from src.services.auth import auth_service
 from src.services.storage import upload_avatar
 from src.conf.config import settings
 from src.repository import users as repository_users
+from src.utils.validate_file_size import validate_file_size
 
 
 router = APIRouter(prefix="/users", tags=["users"])
@@ -20,7 +21,6 @@ router = APIRouter(prefix="/users", tags=["users"])
 
 @router.get("/", response_model=List[UserDb], dependencies=[Depends(access_admin_only)])
 async def get_users(db: AsyncSession = Depends(get_db)):
-    
     """
     Get a list of all users (admin only).
 
@@ -41,7 +41,7 @@ async def get_users(db: AsyncSession = Depends(get_db)):
                 "role": "admin"
             }
         ]
-    """    
+    """
 
     return await list_users(db)
 
@@ -67,8 +67,8 @@ async def change_role(
     :raises HTTPException: 404 if user not found.
     :return: Updated user with new role.
     :rtype: UserDb
-    """    
-    
+    """
+
     user = await repository_users.set_role(user_id, body.role, db)
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
@@ -80,7 +80,7 @@ async def update_avatar(
     file: UploadFile = File(...),
     db: AsyncSession = Depends(get_db),
     current: User = Depends(auth_service.get_current_user),
-): 
+):
     """
     Upload and update the current user's avatar (simple variant).
 
@@ -97,8 +97,10 @@ async def update_avatar(
     :raises HTTPException: 415 if unsupported file type.
     :return: JSON with avatar URL.
     :rtype: dict
-    """    
-    
+    """
+
+    await validate_file_size(file)  # validate file size (max 2 MB)
+
     if file.content_type not in ("image/png", "image/jpeg", "image/jpg", "image/webp"):
         raise HTTPException(status_code=415, detail="Unsupported media type")
     url = await upload_avatar(file.file, public_id=f"ContactsAPI/{current.username}")
@@ -128,8 +130,10 @@ async def update_avatar_user(
     :type db: AsyncSession
     :return: Updated user object with new avatar URL.
     :rtype: UserDb
-    """  
-    
+    """
+
+    await validate_file_size(file)  # validate file size (max 2 MB)
+
     cloudinary.config(
         cloud_name=settings.CLOUDINARY_NAME,
         api_key=settings.CLOUDINARY_API_KEY,
