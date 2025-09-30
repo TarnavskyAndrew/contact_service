@@ -1,26 +1,12 @@
 from enum import Enum
 from fastapi import Depends, HTTPException, status
+
 from src.services.auth import auth_service
 from src.database.models import User
-
-
-class Role(str, Enum):
-    
-    """
-    Enumeration of user roles.
-
-    - ``admin`` : Full access.
-    - ``moderator`` : Limited management access.
-    - ``user`` : Regular user.
-    """    
-    
-    admin = "admin"
-    moderator = "moderator"
-    user = "user"
+from src.models.roles import Role
 
 
 class RoleAccess:
-    
     """
     Dependency for role-based access control.
 
@@ -37,24 +23,21 @@ class RoleAccess:
         async def admin_only_route():
             return {"message": "Admins only"}
 
-    """    
+    """
 
     def __init__(self, allowed: list[Role]):
-        
         """
         Initialize with a list of allowed roles.
 
         :param allowed: List of roles that are permitted.
         :type allowed: list[Role]
-        """        
-        
-        self.allowed = set(allowed)
+        """
 
+        self.allowed = set(allowed)
 
     async def __call__(
         self, current_user: User = Depends(auth_service.get_current_user)
     ) -> User:
-        
         """
         Verify that the current user has one of the allowed roles.
 
@@ -63,8 +46,8 @@ class RoleAccess:
         :raises HTTPException: 403 if role not permitted.
         :return: Current user if role is permitted.
         :rtype: User
-        """        
-        
+        """
+
         if current_user.role not in self.allowed:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden"

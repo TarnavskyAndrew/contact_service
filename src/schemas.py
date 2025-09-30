@@ -3,6 +3,8 @@ from typing import Optional, List
 from datetime import date, datetime
 import re
 
+from src.models.roles import Role
+
 
 EMAIL_REGEX = re.compile(
     r"^(?![.-])"  # local-part не починається з . або -
@@ -92,7 +94,6 @@ class UserModel(BaseModel):
     @field_validator("username")
     @classmethod
     def validate_username(cls, v: str | None) -> str | None:
-
         """Validate username format. TODO: enforce strict regex rules."""
 
         if v is None:
@@ -239,11 +240,11 @@ class RoleUpdate(BaseModel):
     """
     Schema for updating a user's role.
 
-    :ivar role: New role value (e.g., "admin", "moderator", "user").
-    :vartype role: str
+    :ivar role: New role value. Must be one of: "admin", "moderator", "user".
+    :vartype role: Role
     """
 
-    role: str
+    role: Role
 
 
 # --------- AUTH ---------
