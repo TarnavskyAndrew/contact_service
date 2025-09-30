@@ -4,7 +4,6 @@ from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
-
     """
     Global project settings.
 
@@ -29,9 +28,11 @@ class Settings(BaseSettings):
     ACCESS_EXPIRE_MIN: int = 15
     REFRESH_EXPIRE_DAYS: int = 7
 
-    # --- Admin (seed.py) ---
+    # --- Admin and Moderator (seed.py) ---
     ADMIN_EMAIL: EmailStr
     ADMIN_PASSWORD: str
+    MODERATOR_EMAIL: EmailStr
+    MODERATOR_PASSWORD: str
 
     # --- SMTP ---
     MAIL_USERNAME: str
@@ -58,14 +59,14 @@ class Settings(BaseSettings):
     PGADMIN_DEFAULT_PASSWORD: str
 
     # --- FastAPI Testing Token Check ---
-    TEST_PROTECTED_PATH: str = "/api/contacts/"  
+    TEST_PROTECTED_PATH: str = "/api/contacts/"
 
     # --- Pydantic v2 config ---
     model_config = ConfigDict(
         extra="ignore",
         env_file=".env",
         env_file_encoding="utf-8",
-    ) # type: ignore
+    )  # type: ignore
 
     # --- Validators ---
     @field_validator("ALGORITHM")
@@ -78,7 +79,7 @@ class Settings(BaseSettings):
     # --- Properties для строк ---
     @property
     # Async url for SQLAlchemy (asyncpg)
-    def async_db_url(self) -> str:  
+    def async_db_url(self) -> str:
         if self.DATABASE_URL:
             return self.DATABASE_URL
         if all(
@@ -95,14 +96,21 @@ class Settings(BaseSettings):
                 f"@{self.PG_DOMAIN}:{self.PG_PORT}/{self.PG_DB_NAME}"
             )
         raise ValueError("DATABASE_URL or PG_* variables must be set")
-    
-    
+
     @property
     # Sinc url for Alembic (psycopg2)
     def sync_db_url(self) -> str:
         if self.DATABASE_URL:
             return self.DATABASE_URL.replace("+asyncpg", "+psycopg2")
-        if all([self.PG_USER, self.PG_PASSWORD, self.PG_DOMAIN, self.PG_PORT, self.PG_DB_NAME]):
+        if all(
+            [
+                self.PG_USER,
+                self.PG_PASSWORD,
+                self.PG_DOMAIN,
+                self.PG_PORT,
+                self.PG_DB_NAME,
+            ]
+        ):
             return (
                 f"postgresql+psycopg2://{self.PG_USER}:{self.PG_PASSWORD}"
                 f"@{self.PG_DOMAIN}:{self.PG_PORT}/{self.PG_DB_NAME}"
