@@ -35,7 +35,7 @@ contact_service/
 ├─ README.md
 │
 ├─ main.py                  # FastAPI entrypoint (lifespan, middlewares, routers)
-├─ seed.py                  # script to create initial admin user
+├─ seed.py                  # script to create initial admin, user and moderator roles
 ├─ parse_jwt.py             # standalone JWT parser (dev/debug tool)
 ├─ check_smtp.py            # SMTP debug script
 │
@@ -167,6 +167,15 @@ Fallback saves emails into `/tmp_emails/`.
 
 ### Delete contact
 `DELETE /api/contacts/{id}`
+
+
+---
+
+### Seeding test data
+Before running tests, seed the database with a test user and 150 contacts, admin and moderator:
+
+```bash
+poetry run python seed.py
 
 ---
 
