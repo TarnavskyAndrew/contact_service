@@ -28,11 +28,13 @@ class Settings(BaseSettings):
     ACCESS_EXPIRE_MIN: int = 15
     REFRESH_EXPIRE_DAYS: int = 7
 
-    # --- Admin and Moderator (seed.py) ---
+    # --- Admin, User and Moderator (seed.py) ---
     ADMIN_EMAIL: EmailStr
     ADMIN_PASSWORD: str
     MODERATOR_EMAIL: EmailStr
     MODERATOR_PASSWORD: str
+    USER_EMAIL: EmailStr
+    USER_PASSWORD: str
 
     # --- SMTP ---
     MAIL_USERNAME: str
