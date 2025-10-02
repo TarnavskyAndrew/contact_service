@@ -312,36 +312,70 @@ class ContactBase(BaseModel):
     """
     Base schema for contact data.
 
-    :ivar first_name: Contact's first name (1–25 characters).
+    :ivar first_name: Contact's first name (1–25 characters, only letters and - . _ ').
     :vartype first_name: str
-    :ivar last_name: Contact's last name (1–25 characters).
+    :ivar last_name: Contact's last name (1–25 characters, only letters and - . _ ').
     :vartype last_name: str
     :ivar email: Contact's email address (valid, ≤100 chars).
     :vartype email: EmailStr
-    :ivar phone: Contact's phone number (5–20 characters).
+    :ivar phone: Contact's phone number (5–20 digits, optional + at start).
     :vartype phone: str
-    :ivar birthday: Contact's birthday.
+    :ivar birthday: Contact's birthday (must not be in the future).
     :vartype birthday: date
     :ivar extra: Optional extra information (≤250 chars).
     :vartype extra: str | None
     """
 
-    first_name: constr(min_length=1, max_length=25) = Field(
-        ..., description="First name, max 25 chars"
-    )
-    last_name: constr(min_length=1, max_length=25) = Field(
-        ..., description="Last name, max 25 chars"
-    )
+    first_name: constr(
+        pattern=r"^[A-Za-zА-Яа-яЁёІіЇїЄєҐґ][A-Za-zА-Яа-яЁёІіЇїЄєҐґ\-\._']{0,24}$"
+    ) = Field(..., description="First name: 1–25 chars, letters + - . _ ' allowed")
+    last_name: constr(
+        pattern=r"^[A-Za-zА-Яа-яЁёІіЇїЄєҐґ][A-Za-zА-Яа-яЁёІіЇїЄєҐґ\-\._']{0,24}$"
+    ) = Field(..., description="Last name: 1–25 chars, letters + - . _ ' allowed")
     email: EmailStr = Field(
         ..., max_length=100, description="Valid unique email, max 100 chars"
     )
-    phone: constr(min_length=5, max_length=20) = Field(
-        ..., description="Phone number, max 20 chars"
+    phone: str = Field(
+        ..., description="Phone number: E.164 format, stricter rules for UA (+380)"
     )
     birthday: date
     extra: Optional[constr(max_length=250)] = Field(
         None, description="Extra info, max 250 chars"
     )
+
+    # --- Custom validators ---
+    @field_validator("phone")
+    @classmethod
+    def validate_phone(cls, v: str) -> str:
+        # if number doesn't start with + → add it
+        if not v.startswith("+"):
+            v = "+" + v
+
+        # Special rule for Ukraine
+        if v.startswith("+380"):
+            digits = v[4:]
+            if len(digits) != 9:
+                raise ValueError("Ukrainian phone must be in format +380XXXXXXXXX")
+            if not digits.isdigit():
+                raise ValueError("Ukrainian phone must contain only digits")
+        else:
+            # For other countries, check E.164 (8–15 digits total, including country code)
+            digits = v[1:]
+            if not digits.isdigit():
+                raise ValueError("Phone must contain digits only")
+            if digits[0] == "0":
+                raise ValueError("Country code cannot start with 0 (E.164 rule)")
+            if not (8 <= len(digits) <= 15):
+                raise ValueError("Phone must follow E.164 format (+CountryCodeNumber)")
+
+        return v
+
+    @field_validator("birthday")
+    @classmethod
+    def validate_birthday(cls, v: date) -> date:
+        if v > date.today():
+            raise ValueError("Birthday cannot be in the future")
+        return v
 
 
 class ContactCreate(ContactBase):
@@ -361,9 +395,9 @@ class ContactUpdate(BaseModel):
     Schema for updating contact data.
     All fields optional, but validated with same constraints.
 
-    :ivar first_name: Contact's first name (1–25 characters).
+    :ivar first_name: Contact's first name (1–25 characters, only letters and - . _ ').
     :vartype first_name: str | None
-    :ivar last_name: Contact's last name (1–25 characters).
+    :ivar last_name: Contact's last name (1–25 characters, only letters and - . _ ').
     :vartype last_name: str | None
     :ivar email: Contact email (valid, ≤100 chars).
     :vartype email: EmailStr | None
@@ -375,12 +409,57 @@ class ContactUpdate(BaseModel):
     :vartype extra: str | None
     """
 
-    first_name: Optional[constr(min_length=1, max_length=25)]
-    last_name: Optional[constr(min_length=1, max_length=25)]
+    first_name: Optional[
+        constr(
+            pattern=r"^[A-Za-zА-Яа-яЁёІіЇїЄєҐґ][A-Za-zА-Яа-яЁёІіЇїЄєҐґ\-\._']{0,24}$"
+        )
+    ]
+    last_name: Optional[
+        constr(
+            pattern=r"^[A-Za-zА-Яа-яЁёІіЇїЄєҐґ][A-Za-zА-Яа-яЁёІіЇїЄєҐґ\-\._']{0,24}$"
+        )
+    ]
     email: Optional[EmailStr] = Field(None, max_length=100)
-    phone: Optional[constr(min_length=5, max_length=20)]
+    phone: Optional[str] = Field(
+        None,
+        description="Phone number: auto-add + if missing, must follow E.164 format",
+    )
     birthday: Optional[date]
     extra: Optional[constr(max_length=250)]
+
+    # --- Custom validators ---
+    @field_validator("phone")
+    @classmethod
+    def validate_phone(cls, v: str) -> str:
+        # if number doesn't start with + → add it
+        if not v.startswith("+"):
+            v = "+" + v
+
+        # Special rule for Ukraine
+        if v.startswith("+380"):
+            digits = v[4:]
+            if len(digits) != 9:
+                raise ValueError("Ukrainian phone must be in format +380XXXXXXXXX")
+            if not digits.isdigit():
+                raise ValueError("Ukrainian phone must contain only digits")
+        else:
+            # For other countries, check E.164 (8–15 digits total, including country code)
+            digits = v[1:]
+            if not digits.isdigit():
+                raise ValueError("Phone must contain digits only")
+            if digits[0] == "0":
+                raise ValueError("Country code cannot start with 0 (E.164 rule)")
+            if not (8 <= len(digits) <= 15):
+                raise ValueError("Phone must follow E.164 format (+CountryCodeNumber)")
+
+        return v
+
+    @field_validator("birthday")
+    @classmethod
+    def validate_birthday(cls, v: date) -> date:
+        if v > date.today():
+            raise ValueError("Birthday cannot be in the future")
+        return v
 
 
 class ContactResponse(ContactBase):

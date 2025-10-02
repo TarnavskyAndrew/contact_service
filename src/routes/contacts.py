@@ -36,15 +36,17 @@ async def get_contacts(
     :type current_user: User
     :return: List of contacts.
     :rtype: list[ContactResponse]
-    """    
-    
+    """
+
     return await repo_contacts.get_contacts(skip, limit, current_user, db)
 
 
 @router.get(
     "/search",
     response_model=List[ContactResponse],
-    dependencies=[Depends(RateLimiter(times=50, seconds=60))],  # ≤50 requests per minute
+    dependencies=[
+        Depends(RateLimiter(times=50, seconds=60))
+    ],  # ≤50 requests per minute
 )
 async def search_contacts(
     q: str = Query(..., description="Search by first name, last name, or email"),
@@ -62,8 +64,8 @@ async def search_contacts(
     :type current_user: User
     :return: List of matching contacts.
     :rtype: list[ContactResponse]
-    """    
-    
+    """
+
     return await repo_contacts.search_contacts(q, current_user, db)
 
 
@@ -84,15 +86,17 @@ async def get_upcoming_birthdays(
     :type current_user: User
     :return: List of contacts with upcoming birthdays.
     :rtype: list[ContactResponse]
-    """    
-    
+    """
+
     return await repo_contacts.get_upcoming_birthdays(days, current_user, db)
 
 
 @router.get(
     "/{contact_id}",
     response_model=ContactResponse,
-    dependencies=[Depends(RateLimiter(times=50, seconds=60))],  # ≤50 requests per minute
+    dependencies=[
+        Depends(RateLimiter(times=50, seconds=60))
+    ],  # ≤50 requests per minute
 )
 async def get_contact(
     contact_id: int = Path(ge=1),
@@ -111,7 +115,7 @@ async def get_contact(
     :raises HTTPException: 404 if contact not found.
     :return: Contact details.
     :rtype: ContactResponse
-    """       
+    """
     contact = await repo_contacts.get_contact(contact_id, current_user, db)
     if not contact:
         raise HTTPException(
@@ -124,7 +128,9 @@ async def get_contact(
     "/",
     response_model=ContactResponse,
     status_code=status.HTTP_201_CREATED,
-    dependencies=[Depends(RateLimiter(times=5, seconds=60))],  # ≤5 requests per minute
+    dependencies=[
+        Depends(RateLimiter(times=25, seconds=60))
+    ],  # ≤25 requests per minute
 )
 # @router.post("/", response_model=ContactResponse, status_code=status.HTTP_201_CREATED)
 async def create_contact(
@@ -143,7 +149,7 @@ async def create_contact(
     :type current_user: User
     :return: Newly created contact.
     :rtype: ContactResponse
-    """    
+    """
     return await repo_contacts.create_contact(body, current_user, db)
 
 
@@ -168,7 +174,7 @@ async def update_contact(
     :raises HTTPException: 404 if contact not found.
     :return: Updated contact.
     :rtype: ContactResponse
-    """    
+    """
     contact = await repo_contacts.update_contact(contact_id, body, current_user, db)
     if not contact:
         raise HTTPException(
@@ -199,7 +205,7 @@ async def delete_contact(
     :raises HTTPException: 404 if contact not found.
     :return: None (204 No Content).
     :rtype: None
-    """    
+    """
     ok = await repo_contacts.delete_contact(contact_id, current_user, db)
     if not ok:
         raise HTTPException(
