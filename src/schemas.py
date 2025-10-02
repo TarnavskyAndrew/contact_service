@@ -1,5 +1,5 @@
-from pydantic import BaseModel, EmailStr, Field, field_validator
-from typing import Optional, List
+from pydantic import BaseModel, EmailStr, Field, field_validator, constr
+from typing import Optional, List, Literal
 from datetime import date, datetime
 import re
 
@@ -312,38 +312,75 @@ class ContactBase(BaseModel):
     """
     Base schema for contact data.
 
-    :ivar first_name: Contact's first name.
+    :ivar first_name: Contact's first name (1–25 characters).
     :vartype first_name: str
-    :ivar last_name: Contact's last name.
+    :ivar last_name: Contact's last name (1–25 characters).
     :vartype last_name: str
-    :ivar email: Contact email.
+    :ivar email: Contact's email address (valid, ≤100 chars).
     :vartype email: EmailStr
-    :ivar phone: Contact phone number.
+    :ivar phone: Contact's phone number (5–20 characters).
     :vartype phone: str
-    :ivar birthday: Contact birthday.
+    :ivar birthday: Contact's birthday.
     :vartype birthday: date
-    :ivar extra: Optional extra information.
+    :ivar extra: Optional extra information (≤250 chars).
     :vartype extra: str | None
     """
 
-    first_name: str
-    last_name: str
-    email: EmailStr
-    phone: str
+    first_name: constr(min_length=1, max_length=25) = Field(
+        ..., description="First name, max 25 chars"
+    )
+    last_name: constr(min_length=1, max_length=25) = Field(
+        ..., description="Last name, max 25 chars"
+    )
+    email: EmailStr = Field(
+        ..., max_length=100, description="Valid unique email, max 100 chars"
+    )
+    phone: constr(min_length=5, max_length=20) = Field(
+        ..., description="Phone number, max 20 chars"
+    )
     birthday: date
-    extra: Optional[str] = None
+    extra: Optional[constr(max_length=250)] = Field(
+        None, description="Extra info, max 250 chars"
+    )
 
 
 class ContactCreate(ContactBase):
-    """Schema for creating a new contact (same as ContactBase)"""
+    """
+    Schema for creating a new contact.
+
+    Inherits all fields from ContactBase.
+
+    :rtype: ContactCreate
+    """
 
     pass
 
 
-class ContactUpdate(ContactBase):
-    """Schema for updating an existing contact (same as ContactBase)"""
+class ContactUpdate(BaseModel):
+    """
+    Schema for updating contact data.
+    All fields optional, but validated with same constraints.
 
-    pass
+    :ivar first_name: Contact's first name (1–25 characters).
+    :vartype first_name: str | None
+    :ivar last_name: Contact's last name (1–25 characters).
+    :vartype last_name: str | None
+    :ivar email: Contact email (valid, ≤100 chars).
+    :vartype email: EmailStr | None
+    :ivar phone: Contact's phone number (5–20 characters).
+    :vartype phone: str | None
+    :ivar birthday: Contact's birthday.
+    :vartype birthday: date | None
+    :ivar extra: Optional extra information (≤250 chars).
+    :vartype extra: str | None
+    """
+
+    first_name: Optional[constr(min_length=1, max_length=25)]
+    last_name: Optional[constr(min_length=1, max_length=25)]
+    email: Optional[EmailStr] = Field(None, max_length=100)
+    phone: Optional[constr(min_length=5, max_length=20)]
+    birthday: Optional[date]
+    extra: Optional[constr(max_length=250)]
 
 
 class ContactResponse(ContactBase):
